@@ -1,0 +1,180 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת 2 - ניתוח הכנסות</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5e1e5, #f8c1cc);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        header {
+            padding: 40px 0;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #d81b60;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #c2185b;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #555;
+        }
+        .back-btn {
+            background: linear-gradient(45deg, #f06292, #f48fb1);
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .section {
+            padding: 30px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        tableau-viz {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background: #fff;
+        }
+        .insights-list {
+            max-width: 800px;
+            margin: 20px auto;
+            text-align: right;
+        }
+        .insights-list li {
+            font-size: 1em;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px 0;
+            border-top: 1px solid #f48fb1;
+            color: #555;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">חזרה לדף הראשי</a>
+        <header>
+            <h1>מערכת 2 - ניתוח הכנסות</h1>
+            <p>
+                מערכת זו מציגה ניתוח מפורט של ההכנסות החודשיות והשנתיות של חדרי כושר נבחרים, תוך פילוח לפי סוגי מנויים, שירותים נוספים ומקורות הכנסה נוספים. התרשימים הוויזואליים מסייעים בזיהוי הזדמנויות לשיפור הרווחיות והיעילות הכלכלית.
+            </p>
+        </header>
+        <div class="section">
+            <h2>יתרונות המערכת</h2>
+            <p>
+                המערכת מספקת תצוגה ויזואלית של נתוני הכנסות, כולל פילוח לפי מקורות ותקופות, המאפשרת ניתוח מדויק של ביצועים פיננסיים ותכנון אסטרטגי.
+            </p>
+            <ul class="insights-list">
+                <li>ניתוח הכנסות לפי סניף – מאפשר זיהוי סניפים מובילים בהכנסות לצורך חיזוק אסטרטגיות שימור וצמיחה מקומית.</li>
+                <li>פירוט כמות הכנסות בסניפים לפי מין הנרשם/ת – מסייע בזיהוי קהלים רווחיים לפי מגדר לצורך מיקוד קמפיינים.</li>
+                <li>בחינת הכנסות לפי שנה – לחשיפת מגמות שנתיות וניתוח השפעות עונתיות או שינויים בתמחור.</li>
+                <li>חלוקה לפי סוג מנוי (חודשי, שנתי, פרימיום) – לצורך התאמת מסלולי ההצעה והטבות על בסיס רווחיות.</li>
+            </ul>
+        </div>
+        <div class="section" id="tableau">
+            <h2>תרשים ויזואלי</h2>
+            <p>להלן תצוגה ויזואלית של נתוני ההכנסות, המאפשרת ניתוח מעמיק וקל להבנה.</p>
+            <script type="module" src="https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+            <tableau-viz 
+                id="tableauViz"
+                src="https://public.tableau.com/views/_17461040417740/sheet1"
+                toolbar="bottom"
+                hide-tabs
+                width="100%"
+                height="800">
+            </tableau-viz>
+        </div>
+        <footer>
+            <p>© 2025 מערכת ויזואליזציה - אלמוג וקנין. כל הזכויות שמורות.</p>
+        </footer>
+    </div>
+</body>
+</html>
