@@ -1,0 +1,206 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת ויזואליזציה - אלמוג וקנין</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f8c1cc, #f5e1e5);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        header {
+            padding: 40px 0;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #d81b60;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #c2185b;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #555;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        .btn {
+            background: linear-gradient(45deg, #f48fb1, #f06292);
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .section {
+            padding: 30px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 20px auto;
+        }
+        .feature-item {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .feature-item h3 {
+            font-size: 1.2em;
+            color: #d81b60;
+            margin-bottom: 10px;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px 0;
+            border-top: 1px solid #f48fb1;
+            color: #555;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            .btn {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+            .feature-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>המערכת של אלמוג וקנין - מערכת ויזואליזציה מתקדמת</h1>
+            <p>
+                מערכת זו פותחה לניתוח ויזואלי מעמיק של תמונת מצב קהל הלקוחות בחדרי כושר נבחרים. באמצעות תרשימים אינטראקטיביים, היא מספקת תובנות קריטיות על התנהגות מנויים, הכנסות ושיעורי נטישה, ומאפשרת קבלת החלטות מבוססות נתונים לשיפור היעילות התפעולית והשירות ללקוחות.
+            </p>
+        </header>
+        <div class="section">
+            <h2>מטרות המערכת</h2>
+            <p>
+                המערכת נועדה לסייע למנהלי חדרי כושר בהבנת דפוסי הלקוחות ובזיהוי הזדמנויות לשיפור. התרשימים הוויזואליים מאפשרים ניתוח מהיר ומדויק של נתונים מורכבים, תוך הצגת מגמות ודפוסים בצורה ברורה ונגישה. בין היתר, המערכת תומכת בתכנון אסטרטגי, שיפור שימור לקוחות והגדלת הכנסות.
+            </p>
+        </div>
+        <div class="section">
+            <h2>תכונות מרכזיות</h2>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h3>ניתוח התנהגות לקוחות</h3>
+                    <p>הבנת דפוסי ביקורים והעדפות לקוחות לפי גילאים וסוגי מנויים.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>מעקב אחר הכנסות</h3>
+                    <p>פילוח מפורט של מקורות הכנסה לשיפור התכנון הפיננסי.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>זיהוי שיעורי נטישה</h3>
+                    <p>ניתוח גורמי נטישה ופיתוח אסטרטגיות לשימור לקוחות.</p>
+                </div>
+            </div>
+        </div>
+        <div class="button-container">
+            <a href="dash1.html" class="btn">מערכת 1 - ניתוח ממוצעי מנויים</a>
+            <a href="dash2.html" class="btn">מערכת 2 - ניתוח הכנסות</a>
+            <a href="dash3.html" class="btn">מערכת 3 - ניתוח שיעורי נטישה</a>
+        </div>
+        <footer>
+            <p>© 2025 מערכת ויזואליזציה - אלמוג וקנין. כל הזכויות שמורות.</p>
+        </footer>
+    </div>
+    <script>
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', () => {
+                button.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
